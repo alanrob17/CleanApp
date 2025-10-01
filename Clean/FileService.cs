@@ -11,16 +11,53 @@ namespace Clean
 {
     public class FileService
     {
-        public static List<string> GetFileList(string folder)
+        public static List<string> GetFileList(string folder, bool subFolders)
         {
+            var dir = new DirectoryInfo(folder);
             var fileList = new List<string>();
-            GetFiles(fileList, folder);
+
+
+            if (subFolders)
+            {
+                GetFiles(dir, fileList);
+            }
+            else
+            {
+                GetFiles(fileList);
+            }
+
             return fileList;
         }
 
-        private static void GetFiles(List<string> fileList, string folder)
+        private static void GetFiles(DirectoryInfo d, ICollection<string> fileList)
         {
-            var d = new DirectoryInfo(folder);
+            var files = d.GetFiles("*.*");
+
+            foreach (var fileName in files.Select(file => file.FullName))
+            {
+                // TODO: remove .rar and .zip extensions once I figure out how to change these filenames
+                if (Path.GetExtension(fileName.ToLowerInvariant()) != ".exe" && Path.GetExtension(fileName.ToLowerInvariant()) != ".bak" && Path.GetExtension(fileName.ToLowerInvariant()) != ".log")
+                {
+                    fileList.Add(fileName);
+                }
+            }
+
+            // get sub-folders for the current directory
+            var dirs = d.GetDirectories("*.*");
+
+            // recurse
+            foreach (var dir in dirs)
+            {
+                // Console.WriteLine(dir.FullName);
+                GetFiles(dir, fileList);
+            }
+        }
+
+        private static void GetFiles(ICollection<string> fileList)
+        {
+            var imageDirectory = Environment.CurrentDirectory + @"\";
+            var d = new DirectoryInfo(imageDirectory);
+
             var files = d.GetFiles("*.*");
 
             foreach (var fileName in files.Select(file => file.FullName))
@@ -168,6 +205,17 @@ namespace Clean
         public static string RemoveSpaces(string fileName)
         {
             return Regex.Replace(fileName, @"\s+", " ");
+        }
+
+
+        internal static string FixCover(string fileName)
+        {
+            if (fileName.ToLowerInvariant() == "cover")
+            {
+                fileName = "cover";
+            }
+
+            return fileName;
         }
 
         public static void WriteReport(IEnumerable<Item> items)

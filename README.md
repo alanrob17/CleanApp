@@ -2,11 +2,26 @@
 
 This is a simple console application that remove certain characters from a file name. It removes diacritics, emojis and other unwanted characters. I mainly use this to clean music files.
 
-## Usage
+## Basic Usage
 
 ```bash
     clean
 ```
+
+Will clean all files of unwanted characters.
+
+## Full usage
+
+```bash
+    clean -sp
+```
+
+Where:
+
+> ``s`` cleans files in all sub folders.        
+> ``p`` renames files to proper case.
+
+## Results
 
 Once the file is cleaned a report is created detailing all changes to files.
 

@@ -7,9 +7,12 @@ namespace Clean
     {
         public static void Main(string[] args)
         {
+            var argList = ArgumentService.GetArguments(args.ToList());
+                       
             var fileDirectory = Environment.CurrentDirectory;
 
-            List<string> fileList = FileService.GetFileList(fileDirectory);
+            List<string> fileList = FileService.GetFileList(fileDirectory, argList.SubFolder);
+
             List<Item> items = new List<Item>();
             items = FileService.GetItemList(fileList);
 
@@ -20,7 +23,7 @@ namespace Clean
                 item.ChangeName = FileService.RemoveDiacritics(item.ChangeName);
                 item.ChangeName = FileService.ModifyName(item.ChangeName);
 
-                if (item.ChangeName == item.ChangeName.ToUpperInvariant())
+                if (item.ChangeName == item.ChangeName.ToUpperInvariant() || argList.ProperCase == true)
                 {
                     item.ChangeName = item.ChangeName.ToLowerInvariant(); // .ToTitleCase() won't change uppercase filenames
                     item.ChangeName = FileService.FixCase(item.ChangeName);
@@ -28,6 +31,7 @@ namespace Clean
 
                 item.ChangeName = FileService.CleanFileName(item.ChangeName);
                 item.ChangeName = FileService.RemoveSpaces(item.ChangeName);
+                item.ChangeName = FileService.FixCover(item.ChangeName);
             }
 
             var changedItems = FileService.ModifyStatus(items);
