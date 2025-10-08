@@ -19,6 +19,7 @@ namespace Clean
             // Process the filenames
             foreach (var item in items)
             {
+                item.ChangeName = FileService.ChangeCharacter(item.ChangeName);
                 item.ChangeName = FileService.RemoveEmojis(item.ChangeName);
                 item.ChangeName = FileService.RemoveDiacritics(item.ChangeName);
                 item.ChangeName = FileService.ModifyName(item.ChangeName);

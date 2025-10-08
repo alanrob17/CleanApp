@@ -96,7 +96,7 @@ namespace Clean
 
         public static string RemoveEmojis(string filename)
         {
-            var emojisToRemove = new[] { "🎃", "🍑", "💦", "🍆", "❌" };
+            var emojisToRemove = new[] { "🎃", "🍑", "💦", "🍆", "❌", "💓", "❤", "🔥" };
 
             foreach (var emoji in emojisToRemove)
             {
@@ -208,7 +208,7 @@ namespace Clean
         }
 
 
-        internal static string FixCover(string fileName)
+        public static string FixCover(string fileName)
         {
             if (fileName.ToLowerInvariant() == "cover")
             {
@@ -216,6 +216,63 @@ namespace Clean
             }
 
             return fileName;
+        }
+
+        public static string ChangeCharacter(string filename)
+        {
+            var replacements = new Dictionary<string, string>
+                {
+                    { "’", "'" },
+                    { "“", "\"" },
+                    { "”", "\"" },
+                    { "–", "-" },
+                    { "—", "-" },
+                    { "„", "\"" },
+                    { "´", "'" }
+                };
+
+            foreach (var replacement in replacements)
+            {
+                filename = ReplaceEx(filename, replacement.Key, replacement.Value);
+            }
+
+            return filename;
+        }
+
+        private static string ReplaceEx(string original, string pattern, string replacement)
+        {
+            int position0, position1;
+            var count = position0 = position1 = 0;
+            var upperString = original.ToUpper();
+            var upperPattern = pattern.ToUpper();
+            var inc = (original.Length / pattern.Length) * (replacement.Length - pattern.Length);
+            var chars = new char[original.Length + Math.Max(0, inc)];
+            while ((position1 = upperString.IndexOf(upperPattern, position0, StringComparison.Ordinal)) != -1)
+            {
+                for (var i = position0; i < position1; ++i)
+                {
+                    chars[count++] = original[i];
+                }
+
+                for (var i = 0; i < replacement.Length; ++i)
+                {
+                    chars[count++] = replacement[i];
+                }
+
+                position0 = position1 + pattern.Length;
+            }
+
+            if (position0 == 0)
+            {
+                return original;
+            }
+
+            for (var i = position0; i < original.Length; ++i)
+            {
+                chars[count++] = original[i];
+            }
+
+            return new string(chars, 0, count);
         }
 
         public static void WriteReport(IEnumerable<Item> items)
